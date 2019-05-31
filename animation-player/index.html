@@ -20,13 +20,28 @@
       </ul>
     </div>
     <div class="frames">
-      
+      <ul class="frames__list">
+        <!-- ready class frame-select and frame-select-corners -->
+        <li class="frame">
+          <div class="left-top-corner"><p class="frame-number">1</p></div>
+          <div class="delete-frame frame-hide-functions"><img src="assets/delete.svg" alt="Delete frame" class="frame-icons-functions"></div>
+          <div class="copy-frame frame-hide-functions"><img src="assets/copy.svg" alt="Copy frame" class="frame-icons-functions"></div>
+          <div class="move-frame frame-hide-functions"><img src="assets/move-dots.svg" alt="Move frame" class="frame-icons-functions"></div>
+        </li>
+      </ul>
+
+      <div class="frames__addFrame">
+        <div class="frames__addFrame--vertical-line"></div>
+        <div class="frames__addFrame--horizontal-line"></div>
+        <p class="frames__addFrame--text-mod">Add new frame</p>
+      </div>
     </div>
     <div class="drawing">
-      
+      <canvas id="canvas"></canvas>
     </div>
     <div class="preview">
-      
+      <!-- frame rate -->
+      <!-- request animation frame -->
     </div>
   </div>
   
