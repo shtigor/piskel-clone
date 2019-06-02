@@ -12,12 +12,12 @@
   <div class="container">
     <div class="instruments">
       <ul class="pallete__ul">
-        <li class="pallete__ul--pencil"><img src="assets/pencil.svg" alt="Pencil tool" class="pallete__ul--img"></li>
-        <li class="pallete__ul--bucket"><img src="assets/paint_bucket.svg" alt="Paint bucket" class="pallete__ul--img"></li>
-        <li class="pallete__ul--pipette"><img src="assets/pipette.svg" alt="Eye dropper" class="pallete__ul--img"></li>
+        <li class="pallete__ul--pencil instrument"><img src="assets/pencil.svg" alt="Pencil tool" class="pallete__ul--img"></li>
+        <li class="pallete__ul--bucket instrument"><img src="assets/paint_bucket.svg" alt="Paint bucket" class="pallete__ul--img"></li>
+        <li class="pallete__ul--pipette instrument"><img src="assets/pipette.svg" alt="Eye dropper" class="pallete__ul--img"></li>
         <li class="line"></li>
-        <li class="pallete__ul--move"><img src="assets/move.svg" alt="Move tool" class="pallete__ul--img"></li>
-        <li class="pallete__ul--exchange"><img src="assets/exchange.svg" alt="Transform tool" class="pallete__ul--img"></li>
+        <li class="pallete__ul--move instrument"><img src="assets/move.svg" alt="Move tool" class="pallete__ul--img"></li>
+        <li class="pallete__ul--exchange instrument"><img src="assets/exchange.svg" alt="Transform tool" class="pallete__ul--img"></li>
       </ul>
     </div>
     <div class="frames">
@@ -28,6 +28,7 @@
           <div class="delete-frame frame-hide-functions"><img src="assets/delete.svg" alt="Delete frame" class="frame-icons-functions"></div>
           <div class="copy-frame frame-hide-functions"><img src="assets/copy.svg" alt="Copy frame" class="frame-icons-functions"></div>
           <div class="move-frame frame-hide-functions"><img src="assets/move-dots.svg" alt="Move frame" class="frame-icons-functions"></div>
+          <canvas class="frame-canvas" width="107" height="107"></canvas>
         </li>
       </ul>
 
@@ -38,7 +39,7 @@
       </div>
     </div>
     <div class="drawing">
-      <canvas id="canvas"></canvas>
+      <canvas class="canvas-main" width="500" height="500"></canvas>
     </div>
     <div class="preview">
       <!-- frame rate -->

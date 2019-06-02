@@ -70,6 +70,15 @@ body {
   margin: 0 auto;
 }
 
+.instrument-select {
+  background-color: #bebebe;
+  border: 2px solid #ffd700;
+}
+
+.instrument:hover:not(.instrument-select) {
+  background-color: #e7e7e7;
+}
+
 .line {
   border-bottom: 1px solid #ccc;
   margin-bottom: 10px;
@@ -205,12 +214,12 @@ body {
   height: 23px;
 }
 
-#canvas {
+.canvas-main {
   background-color: #e5e5e5;
   border: 1px solid black;
-  min-width: 400px;
-  width: 100%;
-  height: 90vh;
+  /* min-width: 400px; */
+  /* width: 100%; */
+  /* height: auto; */
 }
 
 .preview__animation {
@@ -221,4 +230,8 @@ body {
 .preview__fps {
   background-color: #a1a0a0;
   height: 50px;
+}
+
+.hide-main-canvas {
+  display: none;
 }
