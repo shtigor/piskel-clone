@@ -55,6 +55,7 @@ body {
   box-shadow: 0 3px 3px #ccc;
 }
 
+.pallete__ul--pencil,
 .pallete__ul--bucket,
 .pallete__ul--pipette,
 .pallete__ul--move,
@@ -88,6 +89,10 @@ body {
   background-color: #e6e5e5;
   box-shadow: 0 2px 4px #9b9b9b;
   margin-top: 15px;
+}
+
+.frame:hover:not(.frame-select) {
+  border: 3px solid #838383;
 }
 
 .frame:hover .frame-hide-functions {
