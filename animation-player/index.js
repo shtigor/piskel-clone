@@ -1,6 +1,7 @@
 const addFrame = document.querySelector('.frames__addFrame');
 const framesList = document.querySelector('.frames__list');
-let pencil = false;
+const canvasHeight = 640;
+const canvasWidth = 640;
 
 // Add new frame on click 
 addFrame.addEventListener('click', () => {
@@ -21,8 +22,9 @@ addFrame.addEventListener('click', () => {
   const drawing = document.querySelector('.drawing');
   const canvas = document.createElement('canvas');
   canvas.className = 'canvas-main';
-  canvas.setAttribute('width', 500);
-  canvas.setAttribute('height', 500);
+  // TODO: change statis values
+  canvas.setAttribute('width', canvasWidth);
+  canvas.setAttribute('height', canvasHeight);
 
   drawing.appendChild(canvas);
 
@@ -46,34 +48,91 @@ function updateNumFrames(prevFrame) {
 }
 
 
-function deleteFrame() {
-  let delFrame = document.querySelectorAll('.delete-frame');
+function deleteFrame(target) {
+  
+  // check if only one frame in list
+  if ((target.offsetParent !== null) && (framesList.childElementCount !== 1)) {
+    const frame = target.offsetParent;
+    const prevElement = frame.previousElementSibling;
+    frame.parentNode.removeChild(frame);
+    updateNumFrames(prevElement);
 
-  for (let i = 0; i < delFrame.length; i++) {
-    delFrame[i].addEventListener('click', (event) => {
-      let frame = event.currentTarget.offsetParent;
-      // check if only one frame in list
-      if ((frame !== null) && (framesList.childElementCount !== 1)) {
-        const prevElement = event.currentTarget.offsetParent.previousElementSibling;
-        frame.parentNode.removeChild(frame);
-        updateNumFrames(prevElement);
+    if (!framesList.children[0].classList.contains('frame-select')) {
+      selectFrame(prevElement)
+    }
 
-        if (!framesList.children[0].classList.contains('frame-select')) {
-          selectFrame(prevElement)
-        }
+    // delete main canvas from canvas list
+    if (prevElement) {
+      const canvasList = document.querySelectorAll('.canvas-main');
+      const deleteCanvas = canvasList[+prevElement.innerText - 1];
+      deleteCanvas.parentNode.removeChild(deleteCanvas); 
+    } else {
+      // const firstCanvasList = document.querySelectorAll('.canvas-main')[0];
+      // firstCanvasList.parentNode.removeChild(firstCanvasList); 
 
-        // delete main canvas from canvas list
-        if (prevElement) {
-          const canvasList = document.querySelectorAll('.canvas-main');
-          const deleteCanvas = canvasList[+prevElement.innerText - 1];
-          deleteCanvas.parentNode.removeChild(deleteCanvas); 
-        } else {
-          const firstCanvasList = document.querySelectorAll('.canvas-main')[0];
-          firstCanvasList.parentNode.removeChild(firstCanvasList); 
-        }
-      } 
-    });
+      const canvasList = document.querySelectorAll('.canvas-main');
+      canvasList[1].classList.remove('hide-main-canvas');
+      canvasList[0].parentNode.removeChild(canvasList[0]); 
+    }
   }
+}
+
+function copyFrame(target) {
+  if (target.offsetParent.classList.contains('frame-select')) {
+    const currentFrame = target.offsetParent;
+    const parent = currentFrame.parentNode;
+    const number = +currentFrame.querySelector('.frame-number').innerText;
+    const prevCanvasFrame = currentFrame.querySelector('.frame-canvas');
+
+    const canvasList = document.querySelectorAll('.canvas-main');
+    const parentCanvasMain = document.querySelector('.drawing');
+    const prevCanvasMain = canvasList[number - 1];
+    prevCanvasMain.classList.add('hide-main-canvas');
+
+    const newFrame = document.createElement('li');
+    newFrame.className = 'frame frame-select';
+    newFrame.innerHTML = `
+      <div class="left-top-corner"><p class="frame-number">${number + 1}</p></div>
+      <div class="delete-frame frame-hide-functions"><img src="assets/delete.svg" alt="Delete frame" class="frame-icons-functions"></div>
+      <div class="copy-frame frame-hide-functions"><img src="assets/copy.svg" alt="Copy frame" class="frame-icons-functions"></div>
+      <div class="move-frame frame-hide-functions"><img src="assets/move-dots.svg" alt="Move frame" class="frame-icons-functions"></div>
+      <canvas class="frame-canvas" width="107" height="107"></canvas>`;
+      
+    currentFrame.classList.remove('frame-select');
+
+    parent.insertBefore(newFrame, currentFrame.nextSibling);
+
+    updateNumFrames(newFrame);
+
+    const mainCanvas = document.createElement('canvas');
+    mainCanvas.className = 'canvas-main';
+    // TODO: change statis values
+    mainCanvas.width = canvasWidth;
+    mainCanvas.height = canvasHeight;
+
+    parentCanvasMain.insertBefore(mainCanvas, prevCanvasMain.nextSibling);
+
+    mainCanvas.getContext('2d').drawImage(prevCanvasMain, 0, 0);
+    newFrame.querySelector('.frame-canvas').getContext('2d').drawImage(prevCanvasFrame, 0, 0);
+  }
+}
+
+function operationsOnFrame() {
+  const framesList = document.querySelector('.frames__list');
+  framesList.addEventListener('click', (event) => {
+    let target = event.target;
+
+    while (!target.classList.contains('frames__list') || target === null) {
+      if (target.classList.contains('copy-frame')) {
+        copyFrame(target);
+      } else if (target.classList.contains('delete-frame')) {
+        deleteFrame(target);
+      } else if (target.classList.contains('move-frame')) {
+        console.log('move');
+      }
+      target = target.parentNode || framesList.children[0].parentNode;
+    }
+  });
 }
 
 
@@ -152,6 +211,7 @@ function selectInstrument() {
 
     canvas.addEventListener('mousemove', (event) => {
       if (isDrawing) {
+        context.lineWidth = 20;
         context.lineTo(event.layerX, event.layerY);
         context.stroke();
       }
@@ -160,11 +220,13 @@ function selectInstrument() {
     canvas.addEventListener('mouseup', (event) => {
       const currentCanvas = event.currentTarget;
       const currentFrame = document.querySelector('.frame-select');
-      let scale = true;
+      const canvasStyle = window.getComputedStyle(currentCanvas);
+      const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
+      const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
 
       let context = currentFrame.lastElementChild.getContext('2d');
       
-      context.drawImage(currentCanvas, 0, 0, 500, 500, 0, 0, 107, 107);
+      context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
       isDrawing = false;
     });
   }
@@ -172,10 +234,10 @@ function selectInstrument() {
 }
 
 function draw() {
-  deleteFrame();
-  selectFrame();
-
   selectInstrument();
+  selectFrame();
+  operationsOnFrame();
+
 }
 
-setInterval(draw, 1000);
+setInterval(draw, 700);
