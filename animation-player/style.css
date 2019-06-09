@@ -18,7 +18,7 @@ body {
 .frames, 
 .drawing,
 .preview {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .frames {
@@ -36,6 +36,7 @@ body {
 }
 
 .drawing {
+  position: relative;
   margin-right: 30px;
   width: 65%;
 }
@@ -215,11 +216,12 @@ body {
 }
 
 .canvas-main {
+  position: absolute;
   background-color: #e5e5e5;
   border: 1px solid black;
-  /* min-width: 400px; */
-  /* width: 100%; */
-  /* height: auto; */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .preview__animation {
