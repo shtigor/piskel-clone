@@ -19,6 +19,7 @@ addFrame.addEventListener('click', () => {
     <canvas class="frame-canvas" width="107" height="107"></canvas>`;
   framesList.appendChild(frame);
 
+  // drawing block
   const drawing = document.querySelector('.drawing');
   const canvas = document.createElement('canvas');
   canvas.className = 'canvas-main';
@@ -32,6 +33,23 @@ addFrame.addEventListener('click', () => {
   for (let i = 0; i < canvasList.length - 1; i++) {
     canvasList[i].classList.add('hide-main-canvas');
   }
+
+  // animation block
+  const animation = document.querySelector('.preview__animation');
+  const canvasAnimation = document.createElement('canvas');
+
+  canvasAnimation.className = 'animation';
+  // TODO: change statis values
+  canvasAnimation.setAttribute('width', 270);
+  canvasAnimation.setAttribute('height', 270);
+
+  animation.appendChild(canvasAnimation);
+
+  const canvasAnimationList = document.querySelectorAll('.animation');
+  for (let i = 0; i < canvasAnimationList.length - 1; i++) {
+    canvasAnimationList[i].classList.add('hide-main-canvas');
+  }
+
 });
 
 
@@ -66,13 +84,18 @@ function deleteFrame(target) {
       const canvasList = document.querySelectorAll('.canvas-main');
       const deleteCanvas = canvasList[+prevElement.innerText - 1];
       deleteCanvas.parentNode.removeChild(deleteCanvas); 
-    } else {
-      // const firstCanvasList = document.querySelectorAll('.canvas-main')[0];
-      // firstCanvasList.parentNode.removeChild(firstCanvasList); 
 
+      const animationList = document.querySelectorAll('.animation');
+      const deleteAnimationCanvas = animationList[+prevElement.innerText - 1];
+      deleteAnimationCanvas.parentNode.removeChild(deleteAnimationCanvas);
+    } else {
       const canvasList = document.querySelectorAll('.canvas-main');
       canvasList[1].classList.remove('hide-main-canvas');
       canvasList[0].parentNode.removeChild(canvasList[0]); 
+
+      const animationList = document.querySelectorAll('.animation');
+      animationList[1].classList.remove('hide-main-canvas');
+      animationList[0].parentNode.removeChild(animationList[0]); 
     }
   }
 }
@@ -114,6 +137,21 @@ function copyFrame(target) {
 
     mainCanvas.getContext('2d').drawImage(prevCanvasMain, 0, 0);
     newFrame.querySelector('.frame-canvas').getContext('2d').drawImage(prevCanvasFrame, 0, 0);
+
+    const animationList = document.querySelectorAll('.animation');
+    const newAnimation = document.createElement('canvas');
+    const parentAnimation = document.querySelector('.preview__animation');
+    const prevAnimationCnavas = animationList[number - 1];
+    prevAnimationCnavas.classList.add('hide-main-canvas');
+
+    newAnimation.classList = 'animation';
+    // TODO: change statis values
+    newAnimation.width = 270;
+    newAnimation.height = 270;
+
+    parentAnimation.insertBefore(newAnimation, prevAnimationCnavas.nextSibling);
+
+    newAnimation.getContext('2d').drawImage(prevAnimationCnavas, 0, 0);
   }
 }
 
@@ -165,11 +203,16 @@ function selectFrame(prevElement) {
       const canvasList = document.querySelectorAll('.canvas-main');
       canvasList[+currentSelectFrame.innerText - 1].classList.remove('hide-main-canvas');
 
+      const lastAnimation = document.querySelector('.animation:not(.hide-main-canvas)');
+
+      const animationList = document.querySelectorAll('.animation');
+      animationList[+currentSelectFrame.innerText - 1].classList.remove('hide-main-canvas');
+
       const numShownCanvas = document.querySelectorAll('.canvas-main:not(.hide-main-canvas)');
       if (lastCanvas && numShownCanvas.length === 2) {
         lastCanvas.classList.add('hide-main-canvas');
+        lastAnimation.classList.add('hide-main-canvas');
       }
-
 
     });
   }
@@ -206,13 +249,13 @@ function selectInstrument() {
 
     canvas.addEventListener('mousedown', (event) => {
       isDrawing = true;
-      context.moveTo(event.layerX, event.layerY);
+      context.moveTo(event.offsetX, event.offsetY);
     });
 
     canvas.addEventListener('mousemove', (event) => {
       if (isDrawing) {
         context.lineWidth = 20;
-        context.lineTo(event.layerX, event.layerY);
+        context.lineTo(event.offsetX, event.offsetY);
         context.stroke();
       }
     });
@@ -220,24 +263,54 @@ function selectInstrument() {
     canvas.addEventListener('mouseup', (event) => {
       const currentCanvas = event.currentTarget;
       const currentFrame = document.querySelector('.frame-select');
+      const currentAnimation = document.querySelector('.animation:not(.hide-main-canvas)');
+
       const canvasStyle = window.getComputedStyle(currentCanvas);
       const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
       const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
 
       let context = currentFrame.lastElementChild.getContext('2d');
+      let contextAnimation = currentAnimation.getContext('2d');
       
       context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
+      contextAnimation.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 270, 270);
       isDrawing = false;
     });
   }
 
 }
 
+function animate() {
+  const canvasFrame = document.querySelectorAll('.frame-canvas');
+  const animationList = document.querySelectorAll('.animation');
+  const currentAnimation = document.querySelector('.animation:not(.hide-main-canvas)');
+  for (let i = 0; i < canvasFrame.length; i++) {
+    let currentCanvas = canvasFrame[i]; 
+    let context = currentAnimation.getContext('2d');
+
+    if (animationList[i].classList.contains('hide-main-canvas')) {
+      
+      setInterval(() => {
+        context.clearRect(0,0, 270, 270);
+        context.drawImage(currentCanvas, 0, 0, 270, 270);
+      }, 1000/10);
+    } else {
+      
+      setInterval(() => {
+        context.clearRect(0,0, 270, 270);
+        context.drawImage(currentCanvas, 0, 0, 270, 270);
+      }, 1000/10);
+    }
+  }
+}
+
+
 function draw() {
   selectInstrument();
   selectFrame();
   operationsOnFrame();
-
+  
 }
 
 setInterval(draw, 700);
+setInterval(animate, 100);

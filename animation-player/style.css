@@ -38,7 +38,7 @@ body {
 .drawing {
   position: relative;
   margin-right: 30px;
-  width: 65%;
+  width: 55%;
 }
 
 .preview {
@@ -225,7 +225,6 @@ body {
 }
 
 .preview__animation {
-  background-color: #cccbcb;
   height: 270px;
 }
 
@@ -236,4 +235,9 @@ body {
 
 .hide-main-canvas {
   display: none;
+}
+
+.animation {
+  background-color: #e5e5e5;
+  border: 1px solid black;
 }
