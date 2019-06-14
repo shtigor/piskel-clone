@@ -1,5 +1,6 @@
 const addFrame = document.querySelector('.frames__addFrame');
 const framesList = document.querySelector('.frames__list');
+const palleteTools = document.querySelector('.pallete__ul');
 const canvasHeight = 640;
 const canvasWidth = 640;
 
@@ -50,6 +51,47 @@ addFrame.addEventListener('click', () => {
     canvasAnimationList[i].classList.add('hide-main-canvas');
   }
 
+  const selectedInstrument = document.querySelector('.instrument-select');
+  if (selectedInstrument) {
+    drawPencil();
+  }
+
+});
+
+// change frame on select
+framesList.addEventListener('click', (event) => {
+  let frame = event.target;
+
+  while (!frame.classList.contains('frame')  && !frame.classList.contains('frames__list')) {
+    frame = frame.parentElement;
+  }
+
+
+  if (frame.classList.contains('frame')) selectElement(frame, 'frame-select')
+
+  const lastCanvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+
+  const canvasList = document.querySelectorAll('.canvas-main');
+  canvasList[+frame.innerText - 1].classList.remove('hide-main-canvas');
+
+  const lastAnimation = document.querySelector('.animation:not(.hide-main-canvas)');
+
+  const animationList = document.querySelectorAll('.animation');
+  animationList[+frame.innerText - 1].classList.remove('hide-main-canvas');
+
+  const numShownCanvas = document.querySelectorAll('.canvas-main:not(.hide-main-canvas)');
+  if (lastCanvas && numShownCanvas.length === 2) {
+    lastCanvas.classList.add('hide-main-canvas');
+    lastAnimation.classList.add('hide-main-canvas');
+  }
+
+  const selectedInstrument = document.querySelector('.instrument-select');
+  if (selectedInstrument) {
+    drawPencil();
+  }
+
+  operationsOnFrame();
+  
 });
 
 
@@ -152,25 +194,29 @@ function copyFrame(target) {
     parentAnimation.insertBefore(newAnimation, prevAnimationCnavas.nextSibling);
 
     newAnimation.getContext('2d').drawImage(prevAnimationCnavas, 0, 0);
+
+    const selectedInstrument = document.querySelector('.instrument-select');
+    if (selectedInstrument) {
+      drawPencil();
+    }
   }
 }
 
 function operationsOnFrame() {
   const framesList = document.querySelector('.frames__list');
-  framesList.addEventListener('click', (event) => {
-    let target = event.target;
+  let target = event.target;
 
-    while (!target.classList.contains('frames__list') || target === null) {
-      if (target.classList.contains('copy-frame')) {
-        copyFrame(target);
-      } else if (target.classList.contains('delete-frame')) {
-        deleteFrame(target);
-      } else if (target.classList.contains('move-frame')) {
-        console.log('move');
-      }
-      target = target.parentNode || framesList.children[0].parentNode;
+  while (!target.classList.contains('frames__list') || target === null) {
+    if (target.classList.contains('copy-frame')) {
+      copyFrame(target);
+    } else if (target.classList.contains('delete-frame')) {
+      deleteFrame(target);
+    } else if (target.classList.contains('move-frame')) {
+      // TODO
+      console.log('move');
     }
-  });
+    target = target.parentNode || framesList.children[0].parentNode;
+  }
 }
 
 
@@ -221,29 +267,105 @@ function selectFrame(prevElement) {
 
 // INSTRUMENTS
 
+palleteTools.addEventListener('click', (event) => {
+  let tool = event.target;
 
-function selectInstrument() {
-  const instruments = document.querySelector('.pallete__ul').children;
-
-  for (let i = 0; i < instruments.length; i++) {
-    instruments[i].addEventListener('click', (event) => {
-      const lastSelectInstrument = document.querySelector('.instrument-select');
-
-      const selectedInstrument = event.currentTarget;
-      selectedInstrument.classList.add('instrument-select');
-
-      const numSelectInstruments = document.querySelectorAll('.instrument-select');
-      if (lastSelectInstrument && numSelectInstruments.length === 2) {
-        lastSelectInstrument.classList.remove('instrument-select');
-      }
-    });
+  while (!tool.classList.contains('instrument') && !tool.classList.contains('instruments')) {
+    tool = tool.parentElement;
   }
 
-  const pencilTool = document.querySelector('.pallete__ul--pencil');
-  const selectedInstrument = document.querySelector('.instrument-select');
+  if (tool.classList.contains('pallete__ul--pencil')) {
+    selectElement(tool, 'instrument-select');
 
-  if (selectedInstrument === pencilTool) {
+    drawPencil();
+    
+  
+  } else if (tool.classList.contains('pallete__ul--bucket')) {
+    selectElement(tool, 'instrument-select');
+
     const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+    const context = canvas.getContext('2d');
+    let isDrawing;
+
+    canvas.addEventListener('mousedown', (event) => {
+      
+    });
+
+    canvas.addEventListener('mousemove', (event) => {
+      
+    });
+
+    canvas.addEventListener('mouseup', (event) => {
+      
+    });
+    
+  } else if (tool.classList.contains('pallete__ul--pipette')) {
+    selectElement(tool, 'instrument-select');
+
+    const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+    const context = canvas.getContext('2d');
+    let isDrawing;
+
+    canvas.addEventListener('mousedown', (event) => {
+      
+    });
+
+    canvas.addEventListener('mousemove', (event) => {
+      
+    });
+
+    canvas.addEventListener('mouseup', (event) => {
+      
+    });
+  } else if (tool.classList.contains('pallete__ul--move')) {
+    selectElement(tool, 'instrument-select');
+
+    const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+    const context = canvas.getContext('2d');
+    let isDrawing;
+
+    canvas.addEventListener('mousedown', (event) => {
+      
+    });
+
+    canvas.addEventListener('mousemove', (event) => {
+      
+    });
+
+    canvas.addEventListener('mouseup', (event) => {
+      
+    });
+  } else if (tool.classList.contains('pallete__ul--exchange')) {
+    selectElement(tool, 'instrument-select');
+
+    const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+    const context = canvas.getContext('2d');
+    let isDrawing;
+
+    canvas.addEventListener('mousedown', (event) => {
+      
+    });
+
+    canvas.addEventListener('mousemove', (event) => {
+      
+    });
+
+    canvas.addEventListener('mouseup', (event) => {
+      
+    });
+  }
+});
+
+// find certain class remove and add the same class to another element
+function selectElement(tool, styleClass) {
+  const selectedTool = document.querySelector(`.${styleClass}`);
+
+  if (selectedTool) selectedTool.classList.remove(styleClass);
+  tool.classList.add(styleClass);
+}
+
+function drawPencil() {
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
     const context = canvas.getContext('2d');
     let isDrawing;
 
@@ -276,8 +398,6 @@ function selectInstrument() {
       contextAnimation.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 270, 270);
       isDrawing = false;
     });
-  }
-
 }
 
 function animate() {
@@ -305,12 +425,4 @@ function animate() {
 }
 
 
-function draw() {
-  selectInstrument();
-  selectFrame();
-  operationsOnFrame();
-  
-}
-
-setInterval(draw, 700);
-setInterval(animate, 100);
+// setInterval(animate, 100);
