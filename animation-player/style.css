@@ -228,6 +228,9 @@ body {
 
 .preview__animation {
   height: 270px;
+  width: 270px;
+  /* background-color: limegreen; */
+  background-repeat: no-repeat;
 }
 
 .preview__fps {
@@ -240,6 +243,6 @@ body {
 }
 
 .animation {
-  background-color: #e5e5e5;
+  background-image: url('assets/background.png');
   border: 1px solid black;
 }
