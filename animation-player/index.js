@@ -161,6 +161,10 @@ function copyFrame(target) {
     mainCanvas.getContext('2d').drawImage(prevCanvasMain, 0, 0);
     newFrame.querySelector('.frame-canvas').getContext('2d').drawImage(prevCanvasFrame, 0, 0);
 
+    const prevImage = imageList[number - 1];
+
+    imageList.splice(number - 1, 0, prevImage);
+
     const selectedInstrument = document.querySelector('.instrument-select');
     if (selectedInstrument) {
       drawPencil();
