@@ -37,22 +37,6 @@ addFrame.addEventListener('click', () => {
     canvasList[i].classList.add('hide-main-canvas');
   }
 
-  // animation block
-  const animation = document.querySelector('.preview__animation');
-  // const canvasAnimation = document.createElement('canvas');
-
-  // canvasAnimation.className = 'animation';
-  // TODO: change statis values
-  // canvasAnimation.setAttribute('width', 270);
-  // canvasAnimation.setAttribute('height', 270);
-
-  // animation.appendChild(canvasAnimation);
-
-  // const canvasAnimationList = document.querySelectorAll('.animation');
-  // for (let i = 0; i < canvasAnimationList.length - 1; i++) {
-  //   canvasAnimationList[i].classList.add('hide-main-canvas');
-  // }
-
   const selectedInstrument = document.querySelector('.instrument-select');
   if (selectedInstrument) {
     drawPencil();
@@ -76,15 +60,9 @@ framesList.addEventListener('click', (event) => {
   const canvasList = document.querySelectorAll('.canvas-main');
   canvasList[+frame.innerText - 1].classList.remove('hide-main-canvas');
 
-  // const lastAnimation = document.querySelector('.animation:not(.hide-main-canvas)');
-
-  // const animationList = document.querySelectorAll('.animation');
-  // animationList[+frame.innerText - 1].classList.remove('hide-main-canvas');
-
   const numShownCanvas = document.querySelectorAll('.canvas-main:not(.hide-main-canvas)');
   if (lastCanvas && numShownCanvas.length === 2) {
     lastCanvas.classList.add('hide-main-canvas');
-    // lastAnimation.classList.add('hide-main-canvas');
   }
 
   const selectedInstrument = document.querySelector('.instrument-select');
@@ -129,24 +107,18 @@ function deleteFrame(target) {
       const deleteCanvas = canvasList[+prevElement.innerText];
       deleteCanvas.parentNode.removeChild(deleteCanvas); 
 
-      imageList.splice(+prevElement.innerText + 1, 1);
+      imageList.splice(+prevElement.innerText, 1);
 
       canvasList = document.querySelectorAll('.canvas-main');
       canvasList[+prevElement.innerText-1].classList.remove('hide-main-canvas');
 
-      // const animationList = document.querySelectorAll('.animation');
-      // const deleteAnimationCanvas = animationList[+prevElement.innerText - 1];
-      // deleteAnimationCanvas.parentNode.removeChild(deleteAnimationCanvas);
     } else {
       const canvasList = document.querySelectorAll('.canvas-main');
       canvasList[1].classList.remove('hide-main-canvas');
       canvasList[0].parentNode.removeChild(canvasList[0]); 
 
-      imageList.shift(+prevElement.innerText - 1 ,1);
+      imageList.shift(0 ,1);
 
-      // const animationList = document.querySelectorAll('.animation');
-      // animationList[1].classList.remove('hide-main-canvas');
-      // animationList[0].parentNode.removeChild(animationList[0]); 
     }
   }
 }
@@ -188,21 +160,6 @@ function copyFrame(target) {
 
     mainCanvas.getContext('2d').drawImage(prevCanvasMain, 0, 0);
     newFrame.querySelector('.frame-canvas').getContext('2d').drawImage(prevCanvasFrame, 0, 0);
-
-    // const animationList = document.querySelectorAll('.animation');
-    // const newAnimation = document.createElement('canvas');
-    // const parentAnimation = document.querySelector('.preview__animation');
-    // const prevAnimationCnavas = animationList[number - 1];
-    // prevAnimationCnavas.classList.add('hide-main-canvas');
-
-    // newAnimation.classList = 'animation';
-    // // TODO: change statis values
-    // newAnimation.width = 270;
-    // newAnimation.height = 270;
-
-    // parentAnimation.insertBefore(newAnimation, prevAnimationCnavas.nextSibling);
-
-    // newAnimation.getContext('2d').drawImage(prevAnimationCnavas, 0, 0);
 
     const selectedInstrument = document.querySelector('.instrument-select');
     if (selectedInstrument) {
@@ -258,15 +215,9 @@ function selectFrame(prevElement) {
       const canvasList = document.querySelectorAll('.canvas-main');
       canvasList[+currentSelectFrame.innerText - 1].classList.remove('hide-main-canvas');
 
-      // const lastAnimation = document.querySelector('.animation:not(.hide-main-canvas)');
-
-      // const animationList = document.querySelectorAll('.animation');
-      // animationList[+currentSelectFrame.innerText - 1].classList.remove('hide-main-canvas');
-
       const numShownCanvas = document.querySelectorAll('.canvas-main:not(.hide-main-canvas)');
       if (lastCanvas && numShownCanvas.length === 2) {
         lastCanvas.classList.add('hide-main-canvas');
-        lastAnimation.classList.add('hide-main-canvas');
       }
 
     });
@@ -402,10 +353,8 @@ function drawPencil() {
       const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
 
       let context = currentFrame.lastElementChild.getContext('2d');
-      // let contextAnimation = currentAnimation.getContext('2d');
       
       context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
-      // contextAnimation.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 270, 270);
       isDrawing = false;
 
       const resizeCnavas = document.createElement('canvas');
@@ -414,35 +363,28 @@ function drawPencil() {
       const resizeContext = resizeCnavas.getContext('2d');
       resizeContext.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 270, 270);
 
-      imageList[+currentFrame.innerText] = resizeCnavas.toDataURL();
+      imageList[+currentFrame.innerText - 1] = resizeCnavas.toDataURL();
     });
 }
 
 let numAnimation = imageList.length;
-let currentAnimation = 1;
+let currentAnimation = 0;
 
 function animate() {
   const animationWindow = document.querySelector('.preview__animation');
   numAnimation = imageList.length;
+
+  if (currentAnimation >= numAnimation) {
+    currentAnimation = 0;
+  }
 
   if (numAnimation !== 0) {
     animationWindow.style.backgroundImage = `url(${imageList[currentAnimation]})`;
 
     currentAnimation++;
 
-    if (currentAnimation === numAnimation) {
-      currentAnimation = 1;
-    }
+    
   }
-  
-  // currentAnimation++;
-
- 
-
-  // let a = Math.floor(Math.random() * Math.floor(255));
-  // let b = Math.floor(Math.random() * Math.floor(255));
-  // let c = Math.floor(Math.random() * Math.floor(255));
-  // animationWindow.style.backgroundColor = `rgb(${a},${b},${c})`;
 }
 
 const slider = document.querySelector('.slider');
