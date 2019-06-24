@@ -224,7 +224,7 @@ body {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  cursor: url('assets/cursor.png'), default;
+  /* cursor: url('assets/cursor.png'), default; */
 }
 
 .preview__animation {

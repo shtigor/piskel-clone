@@ -346,34 +346,31 @@ function drawPencil() {
     let y = event.offsetY;
     let squareX = Math.floor(x / 20);
     let squareY = Math.floor(y / 20);
-    if (squareX !== sXCurrent || squareY !== sYCurrent) {
-      sXLast = sXCurrent;
-      sYLast = sYCurrent;
-    }
+
+    sXLast = sXCurrent;
+    sYLast = sYCurrent;
+
     sXCurrent = squareX;
     sYCurrent = squareY;
     coordinates.innerHTML = `${squareX}:${squareY}`
 
-    let color = ctx.getImageData(sXCurrent*20, sYCurrent*20, 1, 1);
-    let pixelColor = `rgba(${color.data[0]},${color.data[1]},${color.data[2]},1})`
-    if ((sXCurrent !== sXLast || sYCurrent !== sYLast) && pixelColor !== 'rgba(0,0,0,1)') { //rgba(201,201,201, 0.1)  
-      // ctx.clearRect(sXLast * 20, sYLast * 20, 20, 20);
-      ctx.fillStyle = 'rgba(201,201,201, 0.1)';
-      ctx.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+    
+    if ((sXCurrent !== sXLast || sYCurrent !== sYLast) && !isDrawing) { //rgba(201,201,201, 0.1) 
+      let colorCurrent = ctx.getImageData(sXCurrent*20, sYCurrent*20, 1, 1);
+      let pixelColorCurrent = `rgba(${colorCurrent.data[0]},${colorCurrent.data[1]},${colorCurrent.data[2]},1)`
+      let colorPrevious = ctx.getImageData(sXLast*20, sYLast*20, 1, 1);
+      let pixelColorPrevious = `rgba(${colorPrevious.data[0]},${colorPrevious.data[1]},${colorPrevious.data[2]},1)`
+      if (pixelColorCurrent !== 'rgba(255,165,0,1)' && pixelColorPrevious !== 'rgba(255,165,0,1)') {
+        ctx.clearRect(sXLast * 20, sYLast * 20, 20, 20);
+        ctx.fillStyle = 'rgba(201,201,201, 0.1)';
+        ctx.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+      }  
     }
   });
 
 
-  canvas.addEventListener('mousedown', (event) => {
-    let sXCurrent = -1;
-    let sYCurrent = -1;
-    let sXLast = 0;
-    let sYLast = 0;
-    
+  canvas.addEventListener('mousedown', (event) => {   
     isDrawing = true;
-    // context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
-
-     
 
     canvas.addEventListener('mousemove', (event) => {
       if (isDrawing) {
@@ -381,10 +378,7 @@ function drawPencil() {
         let y = event.offsetY;
         let squareX = Math.floor(x / 20);
         let squareY = Math.floor(y / 20);
-        if (squareX !== sXCurrent || squareY !== sYCurrent) {
-          sXLast = sXCurrent;
-          sYLast = sYCurrent;
-        }
+
         sXCurrent = squareX;
         sYCurrent = squareY;
         context.fillStyle = 'orange';
@@ -395,7 +389,6 @@ function drawPencil() {
     canvas.addEventListener('mouseup', (event) => {
       const currentCanvas = event.currentTarget;
       const currentFrame = document.querySelector('.frame-select');
-      const currentAnimation = document.querySelector('.animation:not(.hide-main-canvas)');
   
       const canvasStyle = window.getComputedStyle(currentCanvas);
       const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
@@ -453,35 +446,3 @@ slider.addEventListener('click', (event) => {
 });
 
 let interval = setInterval(animate, 1000/sliderValue);
-
-
-// const canvasV = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-// let coordinates = document.querySelector('.coordinates');
-// let sXCurrent = -1;
-// let sYCurrent = -1;
-// let sXLast = 0;
-// let sYLast = 0;
-// canvasV.addEventListener('mousemove', (event) => {
-//   let ctx = canvasV.getContext('2d');
-//   let x = event.offsetX;
-//   let y = event.offsetY;
-//   let squareX = Math.floor(x / 20);
-//   let squareY = Math.floor(y / 20);
-//   if (squareX !== sXCurrent || squareY !== sYCurrent) {
-//     sXLast = sXCurrent;
-//     sYLast = sYCurrent;
-//   }
-//   sXCurrent = squareX;
-//   sYCurrent = squareY;
-//   coordinates.innerHTML = `${squareX}:${squareY}`
-//   ctx.fillStyle = 'green';
-//   // x = 120
-//   // y = 133
-//   // 120 / 20 = 6 square
-//   // 133 / 20 = 6(,65) square
-//   // if (x > squareX * 20 && x < squareX * 20 + 20 && y > squareY * 20 && y < squareY * 20 + 20) {
-//   if (sXCurrent !== sXLast || sYCurrent !== sYLast) {
-//     ctx.clearRect(sXLast * 20, sYLast * 20, 20, 20);
-//     ctx.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
-//   }
-// });
