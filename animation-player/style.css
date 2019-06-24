@@ -224,12 +224,12 @@ body {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  cursor: url('assets/cursor.png'), default;
 }
 
 .preview__animation {
   height: 270px;
   width: 270px;
-  /* background-color: limegreen; */
   background-repeat: no-repeat;
 }
 
@@ -245,4 +245,8 @@ body {
 .animation {
   background-image: url('assets/background.png');
   border: 1px solid black;
+}
+
+.coordinates {
+  margin: 0;
 }
