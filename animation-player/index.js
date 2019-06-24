@@ -440,8 +440,10 @@ function animate() {
 }
 
 const slider = document.querySelector('.slider');
+const fps = document.querySelector('.fps-number');
 slider.addEventListener('click', (event) => {
   sliderValue = +event.target.value;
+  fps.innerHTML = sliderValue;
   if (sliderValue === 0) {
     clearInterval(interval);
   } else {
