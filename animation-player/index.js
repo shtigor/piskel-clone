@@ -1,10 +1,24 @@
 const addFrame = document.querySelector('.frames__addFrame');
 const framesList = document.querySelector('.frames__list');
 const palleteTools = document.querySelector('.pallete__ul');
+const colorPalette = document.querySelector('.first-color');
 const canvasHeight = 640;
 const canvasWidth = 640;
 let imageList = []
 let sliderValue = 5;
+let color = '#000000';
+let colorList = [];
+
+colorPalette.addEventListener("input", (event) => {
+  let colorPalette = document.querySelector('.first-color');
+
+  if (colorPalette) {
+    colorPalette.style.color = event.target.value;
+    color = event.target.value;
+    if (!colorList.includes(color)) colorList.push(color);
+  }
+});
+color = colorPalette.value;
 
 // Add new frame on click 
 addFrame.addEventListener('click', () => {
@@ -244,7 +258,6 @@ palleteTools.addEventListener('click', (event) => {
 
     drawPencil();
     
-  
   } else if (tool.classList.contains('pallete__ul--bucket')) {
     selectElement(tool, 'instrument-select');
 
@@ -252,16 +265,9 @@ palleteTools.addEventListener('click', (event) => {
     const context = canvas.getContext('2d');
     let isDrawing;
 
-    canvas.addEventListener('mousedown', (event) => {
-      
-    });
-
-    canvas.addEventListener('mousemove', (event) => {
-      
-    });
-
-    canvas.addEventListener('mouseup', (event) => {
-      
+  
+    canvas.addEventListener('click', (event) => {
+      console.log(event);
     });
     
   } else if (tool.classList.contains('pallete__ul--pipette')) {
@@ -271,17 +277,7 @@ palleteTools.addEventListener('click', (event) => {
     const context = canvas.getContext('2d');
     let isDrawing;
 
-    canvas.addEventListener('mousedown', (event) => {
-      
-    });
-
-    canvas.addEventListener('mousemove', (event) => {
-      
-    });
-
-    canvas.addEventListener('mouseup', (event) => {
-      
-    });
+    
   } else if (tool.classList.contains('pallete__ul--move')) {
     selectElement(tool, 'instrument-select');
 
@@ -289,17 +285,7 @@ palleteTools.addEventListener('click', (event) => {
     const context = canvas.getContext('2d');
     let isDrawing;
 
-    canvas.addEventListener('mousedown', (event) => {
-      
-    });
 
-    canvas.addEventListener('mousemove', (event) => {
-      
-    });
-
-    canvas.addEventListener('mouseup', (event) => {
-      
-    });
   } else if (tool.classList.contains('pallete__ul--exchange')) {
     selectElement(tool, 'instrument-select');
 
@@ -307,17 +293,7 @@ palleteTools.addEventListener('click', (event) => {
     const context = canvas.getContext('2d');
     let isDrawing;
 
-    canvas.addEventListener('mousedown', (event) => {
-      
-    });
 
-    canvas.addEventListener('mousemove', (event) => {
-      
-    });
-
-    canvas.addEventListener('mouseup', (event) => {
-      
-    });
   }
 });
 
@@ -355,12 +331,13 @@ function drawPencil() {
     coordinates.innerHTML = `${squareX}:${squareY}`
 
     
-    if ((sXCurrent !== sXLast || sYCurrent !== sYLast) && !isDrawing) { //rgba(201,201,201, 0.1) 
+    if ((sXCurrent !== sXLast || sYCurrent !== sYLast) && !isDrawing) {
       let colorCurrent = ctx.getImageData(sXCurrent*20, sYCurrent*20, 1, 1);
       let pixelColorCurrent = `rgba(${colorCurrent.data[0]},${colorCurrent.data[1]},${colorCurrent.data[2]},1)`
       let colorPrevious = ctx.getImageData(sXLast*20, sYLast*20, 1, 1);
       let pixelColorPrevious = `rgba(${colorPrevious.data[0]},${colorPrevious.data[1]},${colorPrevious.data[2]},1)`
-      if (pixelColorCurrent !== 'rgba(255,165,0,1)' && pixelColorPrevious !== 'rgba(255,165,0,1)') {
+      // if (pixelColorCurrent !== 'rgba(255,165,0,1)' && pixelColorPrevious !== 'rgba(255,165,0,1)') {
+      if (colorList.includes(pixelColorCurrent) && colorList.includes(pixelColorPrevious)) {
         ctx.clearRect(sXLast * 20, sYLast * 20, 20, 20);
         ctx.fillStyle = 'rgba(201,201,201, 0.1)';
         ctx.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
@@ -381,7 +358,7 @@ function drawPencil() {
 
         sXCurrent = squareX;
         sYCurrent = squareY;
-        context.fillStyle = 'orange';
+        context.fillStyle = color;
         context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
       }
     });
@@ -408,8 +385,6 @@ function drawPencil() {
       imageList[+currentFrame.innerText - 1] = resizeCnavas.toDataURL();
     });
   });
-
-  
 }
 
 let numAnimation = imageList.length;
