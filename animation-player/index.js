@@ -9,6 +9,12 @@ let sliderValue = 5;
 let color = '#000000';
 let colorList = [];
 
+// INITIALIZE
+const currentSelectFrame = document.querySelector('.frame-select');
+const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+moveImageFromBCanToS(canvas, currentSelectFrame, canvasWidth, canvasHeight);
+
+
 colorPalette.addEventListener("input", (event) => {
   let colorPalette = document.querySelector('.first-color');
 
@@ -18,7 +24,6 @@ colorPalette.addEventListener("input", (event) => {
     if (!colorList.includes(color)) colorList.push(color);
   }
 });
-color = colorPalette.value;
 
 // Add new frame on click 
 addFrame.addEventListener('click', () => {
@@ -46,6 +51,8 @@ addFrame.addEventListener('click', () => {
   canvas.getContext('2d').drawImage(canvas, 0, 0, canvasWidth, canvasHeight, 0, 0, 32, 32);
 
   drawing.appendChild(canvas);
+
+  moveImageFromBCanToS(canvas, frame, canvasWidth, canvasHeight);
 
   const canvasList = document.querySelectorAll('.canvas-main');
   for (let i = 0; i < canvasList.length - 1; i++) {
@@ -78,6 +85,11 @@ framesList.addEventListener('click', (event) => {
   const numShownCanvas = document.querySelectorAll('.canvas-main:not(.hide-main-canvas)');
   if (lastCanvas && numShownCanvas.length === 2) {
     lastCanvas.classList.add('hide-main-canvas');
+  }
+
+  if (sliderValue === 0) {
+    const animationWindow = document.querySelector('.preview__animation');
+    animationWindow.style.backgroundImage = `url(${imageList[+frame.innerText  - 1]})`;
   }
 
   const selectedInstrument = document.querySelector('.instrument-select');
@@ -376,36 +388,23 @@ function drawPencil() {
       context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
       isDrawing = false;
   
-      const resizeCnavas = document.createElement('canvas');
-      resizeCnavas.width = 270;
-      resizeCnavas.height = 270;
-      const resizeContext = resizeCnavas.getContext('2d');
-      resizeContext.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 270, 270);
-  
-      imageList[+currentFrame.innerText - 1] = resizeCnavas.toDataURL();
+      moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
     });
   });
+}
+// move image from big canvas to small canvas
+function moveImageFromBCanToS(mainCanvas, frame, w, h) {
+  const resizeCnavas = document.createElement('canvas');
+  resizeCnavas.width = 270;
+  resizeCnavas.height = 270;
+  const resizeContext = resizeCnavas.getContext('2d');
+  resizeContext.drawImage(mainCanvas, 0, 0, w, h, 0, 0, 270, 270);
+
+  imageList[+frame.innerText - 1] = resizeCnavas.toDataURL();
 }
 
 let numAnimation = imageList.length;
 let currentAnimation = 0;
-
-function animate() {
-  const animationWindow = document.querySelector('.preview__animation');
-  numAnimation = imageList.length;
-
-  if (currentAnimation >= numAnimation) {
-    currentAnimation = 0;
-  }
-
-  if (numAnimation !== 0) {
-    animationWindow.style.backgroundImage = `url(${imageList[currentAnimation]})`;
-
-    currentAnimation++;
-
-    
-  }
-}
 
 const slider = document.querySelector('.slider');
 const fps = document.querySelector('.fps-number');
@@ -419,5 +418,20 @@ slider.addEventListener('click', (event) => {
     interval = setInterval(animate, 1000/sliderValue);
   }
 });
+
+function animate() {
+  const animationWindow = document.querySelector('.preview__animation');
+  numAnimation = imageList.length;
+
+  if (currentAnimation >= numAnimation) {
+    currentAnimation = 0;
+  }
+
+  if (numAnimation !== 0) {
+    animationWindow.style.backgroundImage = `url(${imageList[currentAnimation]})`;
+
+    currentAnimation++; 
+  }
+}
 
 let interval = setInterval(animate, 1000/sliderValue);
