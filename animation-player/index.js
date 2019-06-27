@@ -1,13 +1,13 @@
 const addFrame = document.querySelector('.frames__addFrame');
 const framesList = document.querySelector('.frames__list');
 const palleteTools = document.querySelector('.pallete__ul');
-const colorPalette = document.querySelector('.first-color');
+const colourPalette = document.querySelector('.first-colour');
 const canvasHeight = 640;
 const canvasWidth = 640;
 let imageList = []
 let sliderValue = 5;
-let color = '#000000';
-let colorList = [];
+let colour = '#408080'; //'#000000';
+let colourList = [colour];
 
 // INITIALIZE
 const currentSelectFrame = document.querySelector('.frame-select');
@@ -15,13 +15,13 @@ const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
 moveImageFromBCanToS(canvas, currentSelectFrame, canvasWidth, canvasHeight);
 
 
-colorPalette.addEventListener("input", (event) => {
-  let colorPalette = document.querySelector('.first-color');
+colourPalette.addEventListener("input", (event) => {
+  let colourPalette = document.querySelector('.first-colour');
 
-  if (colorPalette) {
-    colorPalette.style.color = event.target.value;
-    color = event.target.value;
-    if (!colorList.includes(color)) colorList.push(color);
+  if (colourPalette) {
+    colourPalette.style.colour = event.target.value;
+    colour = event.target.value;
+    if (!colourList.includes(colour)) colourList.push(colour);
   }
 });
 
@@ -277,10 +277,44 @@ palleteTools.addEventListener('click', (event) => {
     const context = canvas.getContext('2d');
     let isDrawing;
 
-  
+
+
     canvas.addEventListener('click', (event) => {
-      console.log(event);
+      let x = event.offsetX;
+      let y = event.offsetY;
+      let squareX = Math.floor(x / 20);
+      let squareY = Math.floor(y / 20);
+
+      let turnsList = [];
+      turnsList.push([squareX, squareY]);
+      
+      while (turnsList.length) {
+        newPos = turnsList.pop();
+        squareX = newPos[0];
+        squareY = newPos[1];
+        let pixelList = context.getImageData(x, y, 1, 1);
+        let colourBorder = `#${pixelList.data[0].toString(16)}${pixelList.data[1].toString(16)}${pixelList.data[2].toString(16)}`;
+        while (!colourList.includes(colourBorder) && squareY !== 0) {
+          squareY--;
+          pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+          colourBorder = `#${pixelList.data[0].toString(16)}${pixelList.data[1].toString(16)}${pixelList.data[2].toString(16)}`;
+        }
+        colourBorder = "";
+        while (!colourList.includes(colourBorder) && squareY !== 31) {
+          squareY++;
+          pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+          colourBorder = `#${pixelList.data[0].toString(16)}${pixelList.data[1].toString(16)}${pixelList.data[2].toString(16)}`;
+          if (!colourList.includes(colourBorder)) {
+            context.fillStyle = colour;
+            context.fillRect(squareX * 20, squareY * 20, 20, 20);
+          }
+          
+        }
+      }
+
+      console.log(`${squareX}:${squareY}`);
     });
+
     
   } else if (tool.classList.contains('pallete__ul--pipette')) {
     selectElement(tool, 'instrument-select');
@@ -344,12 +378,11 @@ function drawPencil() {
 
     
     if ((sXCurrent !== sXLast || sYCurrent !== sYLast) && !isDrawing) {
-      let colorCurrent = ctx.getImageData(sXCurrent*20, sYCurrent*20, 1, 1);
-      let pixelColorCurrent = `rgba(${colorCurrent.data[0]},${colorCurrent.data[1]},${colorCurrent.data[2]},1)`
-      let colorPrevious = ctx.getImageData(sXLast*20, sYLast*20, 1, 1);
-      let pixelColorPrevious = `rgba(${colorPrevious.data[0]},${colorPrevious.data[1]},${colorPrevious.data[2]},1)`
-      // if (pixelColorCurrent !== 'rgba(255,165,0,1)' && pixelColorPrevious !== 'rgba(255,165,0,1)') {
-      if (colorList.includes(pixelColorCurrent) && colorList.includes(pixelColorPrevious)) {
+      let colourCurrent = ctx.getImageData(sXCurrent*20, sYCurrent*20, 1, 1);
+      let pixelColourCurrent = `rgba(${colourCurrent.data[0]},${colourCurrent.data[1]},${colourCurrent.data[2]},1)`
+      let colourPrevious = ctx.getImageData(sXLast*20, sYLast*20, 1, 1);
+      let pixelColourPrevious = `rgba(${colourPrevious.data[0]},${colourPrevious.data[1]},${colourPrevious.data[2]},1)`
+      if (colourList.includes(pixelColourCurrent) && colourList.includes(pixelColourPrevious)) {
         ctx.clearRect(sXLast * 20, sYLast * 20, 20, 20);
         ctx.fillStyle = 'rgba(201,201,201, 0.1)';
         ctx.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
@@ -358,7 +391,7 @@ function drawPencil() {
   });
 
 
-  canvas.addEventListener('mousedown', (event) => {   
+  canvas.addEventListener('mousedown', () => {   
     isDrawing = true;
 
     canvas.addEventListener('mousemove', (event) => {
@@ -370,7 +403,7 @@ function drawPencil() {
 
         sXCurrent = squareX;
         sYCurrent = squareY;
-        context.fillStyle = color;
+        context.fillStyle = colour;
         context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
       }
     });
