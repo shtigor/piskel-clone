@@ -275,8 +275,11 @@ palleteTools.addEventListener('click', (event) => {
 
     const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
     const context = canvas.getContext('2d');
-    let isDrawing;
+    // let isDrawing;
 
+    canvas.removeEventListener('mousedown', pencilDrawAction);
+    // canvas.removeEventListener('mousemove',);
+    // canvas.removeEventListener('mouseup',);
 
 
     canvas.addEventListener('click', (event) => {
@@ -293,22 +296,36 @@ palleteTools.addEventListener('click', (event) => {
         squareX = newPos[0];
         squareY = newPos[1];
         let pixelList = context.getImageData(x, y, 1, 1);
-        let colourBorder = `#${pixelList.data[0].toString(16)}${pixelList.data[1].toString(16)}${pixelList.data[2].toString(16)}`;
+        let colourBorder = rgbToHex(pixelList);
+        let leftSquareCheck = squareX - 1;
+        let colorLeftSquare = '';
+        let rightSquareCheck = squareX + 1;
+        let colorRightSquare = '';
         while (!colourList.includes(colourBorder) && squareY !== 0) {
           squareY--;
           pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-          colourBorder = `#${pixelList.data[0].toString(16)}${pixelList.data[1].toString(16)}${pixelList.data[2].toString(16)}`;
+          colourBorder = rgbToHex(pixelList);
         }
+        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+        colourBorder = rgbToHex(pixelList);
+        if (colourList.includes(colourBorder)) squareY++;
+
+        pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
+        colorLeftSquare = rgbToHex(pixelListLeft);
+        if (!colourList.includes(colorLeftSquare)) turnsList.push([leftSquareCheck, squareY]);
+        // pixelListRight = context.getImageData(squareX++ * 20, squareY * 20, 1, 1);
+        
         colourBorder = "";
-        while (!colourList.includes(colourBorder) && squareY !== 31) {
-          squareY++;
+        while (!colourList.includes(colourBorder) && squareY !== 32) {
           pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-          colourBorder = `#${pixelList.data[0].toString(16)}${pixelList.data[1].toString(16)}${pixelList.data[2].toString(16)}`;
+          colourBorder = rgbToHex(pixelList);
+
           if (!colourList.includes(colourBorder)) {
             context.fillStyle = colour;
             context.fillRect(squareX * 20, squareY * 20, 20, 20);
           }
-          
+
+          squareY++;
         }
       }
 
@@ -342,6 +359,18 @@ palleteTools.addEventListener('click', (event) => {
 
   }
 });
+
+function rgbToHex(rgb) {
+  let red = rgb.data[0];
+  let green = rgb.data[1];
+  let blue = rgb.data[2];
+
+  red.toString(16).length < 2 ? red = `0${red.toString(16)}` : red = `${red.toString(16)}`
+  green.toString(16).length < 2 ? green = `0${green.toString(16)}` : green = `${green.toString(16)}`
+  blue.toString(16).length < 2 ? blue = `0${blue.toString(16)}` : blue = `${blue.toString(16)}`
+
+  return `#${red}${green}${blue}`;
+}
 
 // find certain class remove and add the same class to another element
 function selectElement(tool, styleClass) {
@@ -391,40 +420,45 @@ function drawPencil() {
   });
 
 
-  canvas.addEventListener('mousedown', () => {   
-    isDrawing = true;
+  canvas.addEventListener('mousedown', pencilDrawAction);
+}
 
-    canvas.addEventListener('mousemove', (event) => {
-      if (isDrawing) {
-        let x = event.offsetX;
-        let y = event.offsetY;
-        let squareX = Math.floor(x / 20);
-        let squareY = Math.floor(y / 20);
+function pencilDrawAction() { 
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+  const context = canvas.getContext('2d'); 
+  let isDrawing = true;
 
-        sXCurrent = squareX;
-        sYCurrent = squareY;
-        context.fillStyle = colour;
-        context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
-      }
-    });
-  
-    canvas.addEventListener('mouseup', (event) => {
-      const currentCanvas = event.currentTarget;
-      const currentFrame = document.querySelector('.frame-select');
-  
-      const canvasStyle = window.getComputedStyle(currentCanvas);
-      const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
-      const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
-  
-      let context = currentFrame.lastElementChild.getContext('2d');
-      
-      context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
-      isDrawing = false;
-  
-      moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
-    });
+  canvas.addEventListener('mousemove', (event) => {
+    if (isDrawing) {
+      let x = event.offsetX;
+      let y = event.offsetY;
+      let squareX = Math.floor(x / 20);
+      let squareY = Math.floor(y / 20);
+
+      sXCurrent = squareX;
+      sYCurrent = squareY;
+      context.fillStyle = colour;
+      context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+    }
+  });
+
+  canvas.addEventListener('mouseup', (event) => {
+    const currentCanvas = event.currentTarget;
+    const currentFrame = document.querySelector('.frame-select');
+
+    const canvasStyle = window.getComputedStyle(currentCanvas);
+    const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
+    const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
+
+    let context = currentFrame.lastElementChild.getContext('2d');
+    
+    context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
+    isDrawing = false;
+
+    moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
   });
 }
+
 // move image from big canvas to small canvas
 function moveImageFromBCanToS(mainCanvas, frame, w, h) {
   const resizeCnavas = document.createElement('canvas');
