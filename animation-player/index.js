@@ -295,8 +295,10 @@ palleteTools.addEventListener('click', (event) => {
         newPos = turnsList.pop();
         squareX = newPos[0];
         squareY = newPos[1];
-        let pixelList = context.getImageData(x, y, 1, 1);
+        let pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
         let colourBorder = rgbToHex(pixelList);
+        let reachLeft = false;
+        let reachRight = false;
         let leftSquareCheck = squareX - 1;
         let colorLeftSquare = '';
         let rightSquareCheck = squareX + 1;
@@ -310,10 +312,6 @@ palleteTools.addEventListener('click', (event) => {
         colourBorder = rgbToHex(pixelList);
         if (colourList.includes(colourBorder)) squareY++;
 
-        pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
-        colorLeftSquare = rgbToHex(pixelListLeft);
-        if (!colourList.includes(colorLeftSquare)) turnsList.push([leftSquareCheck, squareY]);
-        // pixelListRight = context.getImageData(squareX++ * 20, squareY * 20, 1, 1);
         
         colourBorder = "";
         while (!colourList.includes(colourBorder) && squareY !== 32) {
@@ -325,11 +323,34 @@ palleteTools.addEventListener('click', (event) => {
             context.fillRect(squareX * 20, squareY * 20, 20, 20);
           }
 
+          // left side
+          let pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
+          colorLeftSquare = rgbToHex(pixelListLeft);
+          if (!colourList.includes(colorLeftSquare)) {
+            if (!reachLeft) {
+              turnsList.push([leftSquareCheck, squareY]);
+              reachLeft = true;
+            }   
+          } else if (reachLeft) {
+            reachLeft = false;
+          }
+
+          // right side
+          let pixelListRight = context.getImageData(rightSquareCheck * 20, squareY * 20, 1, 1);
+          colorRightSquare = rgbToHex(pixelListRight);
+          if (!colourList.includes(colorRightSquare)) {
+            if (!reachRight) {
+              turnsList.push([rightSquareCheck, squareY]);
+              reachRight = true;
+            }   
+          } else if (reachRight) {
+            reachRight = false;
+          }
           squareY++;
+          pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+          colourBorder = rgbToHex(pixelList);
         }
       }
-
-      console.log(`${squareX}:${squareY}`);
     });
 
     
