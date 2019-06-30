@@ -327,7 +327,7 @@ palleteTools.addEventListener('click', (event) => {
           let pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
           colorLeftSquare = rgbToHex(pixelListLeft);
           if (!colourList.includes(colorLeftSquare)) {
-            if (!reachLeft) {
+            if (!reachLeft && leftSquareCheck !== -1) {
               turnsList.push([leftSquareCheck, squareY]);
               reachLeft = true;
             }   
@@ -339,7 +339,7 @@ palleteTools.addEventListener('click', (event) => {
           let pixelListRight = context.getImageData(rightSquareCheck * 20, squareY * 20, 1, 1);
           colorRightSquare = rgbToHex(pixelListRight);
           if (!colourList.includes(colorRightSquare)) {
-            if (!reachRight) {
+            if (!reachRight && rightSquareCheck !== 32) {
               turnsList.push([rightSquareCheck, squareY]);
               reachRight = true;
             }   
