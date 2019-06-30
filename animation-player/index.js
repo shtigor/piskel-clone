@@ -273,86 +273,7 @@ palleteTools.addEventListener('click', (event) => {
   } else if (tool.classList.contains('pallete__ul--bucket')) {
     selectElement(tool, 'instrument-select');
 
-    const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-    const context = canvas.getContext('2d');
-    // let isDrawing;
-
-    canvas.removeEventListener('mousedown', pencilDrawAction);
-    // canvas.removeEventListener('mousemove',);
-    // canvas.removeEventListener('mouseup',);
-
-
-    canvas.addEventListener('click', (event) => {
-      let x = event.offsetX;
-      let y = event.offsetY;
-      let squareX = Math.floor(x / 20);
-      let squareY = Math.floor(y / 20);
-
-      let turnsList = [];
-      turnsList.push([squareX, squareY]);
-      
-      while (turnsList.length) {
-        newPos = turnsList.pop();
-        squareX = newPos[0];
-        squareY = newPos[1];
-        let pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-        let colourBorder = rgbToHex(pixelList);
-        let reachLeft = false;
-        let reachRight = false;
-        let leftSquareCheck = squareX - 1;
-        let colorLeftSquare = '';
-        let rightSquareCheck = squareX + 1;
-        let colorRightSquare = '';
-        while (!colourList.includes(colourBorder) && squareY !== 0) {
-          squareY--;
-          pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-          colourBorder = rgbToHex(pixelList);
-        }
-        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-        colourBorder = rgbToHex(pixelList);
-        if (colourList.includes(colourBorder)) squareY++;
-
-        
-        colourBorder = "";
-        while (!colourList.includes(colourBorder) && squareY !== 32) {
-          pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-          colourBorder = rgbToHex(pixelList);
-
-          if (!colourList.includes(colourBorder)) {
-            context.fillStyle = colour;
-            context.fillRect(squareX * 20, squareY * 20, 20, 20);
-          }
-
-          // left side
-          let pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
-          colorLeftSquare = rgbToHex(pixelListLeft);
-          if (!colourList.includes(colorLeftSquare)) {
-            if (!reachLeft && leftSquareCheck !== -1) {
-              turnsList.push([leftSquareCheck, squareY]);
-              reachLeft = true;
-            }   
-          } else if (reachLeft) {
-            reachLeft = false;
-          }
-
-          // right side
-          let pixelListRight = context.getImageData(rightSquareCheck * 20, squareY * 20, 1, 1);
-          colorRightSquare = rgbToHex(pixelListRight);
-          if (!colourList.includes(colorRightSquare)) {
-            if (!reachRight && rightSquareCheck !== 32) {
-              turnsList.push([rightSquareCheck, squareY]);
-              reachRight = true;
-            }   
-          } else if (reachRight) {
-            reachRight = false;
-          }
-          squareY++;
-          pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-          colourBorder = rgbToHex(pixelList);
-        }
-      }
-    });
-
+   paintBucket();    
     
   } else if (tool.classList.contains('pallete__ul--pipette')) {
     selectElement(tool, 'instrument-select');
@@ -380,6 +301,101 @@ palleteTools.addEventListener('click', (event) => {
 
   }
 });
+
+function paintBucket() {
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+  const context = canvas.getContext('2d');
+
+  canvas.removeEventListener('mousedown', pencilDrawAction);
+  canvas.removeEventListener('mouseup', pencilDrawAction);
+
+  canvas.addEventListener('click', (event) => {
+    let x = event.offsetX;
+    let y = event.offsetY;
+    let squareX = Math.floor(x / 20);
+    let squareY = Math.floor(y / 20);
+
+    let turnsList = [];
+    turnsList.push([squareX, squareY]);
+    
+    while (turnsList.length) {
+      newPos = turnsList.pop();
+      squareX = newPos[0];
+      squareY = newPos[1];
+      let pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+      let colourBorder = rgbToHex(pixelList);
+      let reachLeft = false;
+      let reachRight = false;
+      let leftSquareCheck = squareX - 1;
+      let colorLeftSquare = '';
+      let rightSquareCheck = squareX + 1;
+      let colorRightSquare = '';
+      while (!colourList.includes(colourBorder) && squareY !== 0) {
+        squareY--;
+        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+        colourBorder = rgbToHex(pixelList);
+      }
+      pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+      colourBorder = rgbToHex(pixelList);
+      if (colourList.includes(colourBorder)) squareY++;
+
+      
+      colourBorder = "";
+      while (!colourList.includes(colourBorder) && squareY !== 32) {
+        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+        colourBorder = rgbToHex(pixelList);
+
+        if (!colourList.includes(colourBorder)) {
+          context.fillStyle = colour;
+          context.fillRect(squareX * 20, squareY * 20, 20, 20);
+        }
+
+        // left side
+        let pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
+        colorLeftSquare = rgbToHex(pixelListLeft);
+        if (!colourList.includes(colorLeftSquare)) {
+          if (!reachLeft && leftSquareCheck !== -1) {
+            turnsList.push([leftSquareCheck, squareY]);
+            reachLeft = true;
+          }   
+        } else if (reachLeft) {
+          reachLeft = false;
+        }
+
+        // right side
+        let pixelListRight = context.getImageData(rightSquareCheck * 20, squareY * 20, 1, 1);
+        colorRightSquare = rgbToHex(pixelListRight);
+        if (!colourList.includes(colorRightSquare)) {
+          if (!reachRight && rightSquareCheck !== 32) {
+            turnsList.push([rightSquareCheck, squareY]);
+            reachRight = true;
+          }   
+        } else if (reachRight) {
+          reachRight = false;
+        }
+        squareY++;
+        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+        colourBorder = rgbToHex(pixelList);
+      }
+    }
+    drawOnCanvases();
+  });
+}
+
+function drawOnCanvases() {
+  const currentCanvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+  const currentFrame = document.querySelector('.frame-select');
+
+  const canvasStyle = window.getComputedStyle(currentCanvas);
+  const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
+  const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
+
+  let context = currentFrame.lastElementChild.getContext('2d');
+  
+  context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
+
+  moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
+}
 
 function rgbToHex(rgb) {
   let red = rgb.data[0];
@@ -475,6 +491,31 @@ function pencilDrawAction() {
     
     context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
     isDrawing = false;
+
+    moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
+  });
+
+  canvas.addEventListener('click', (event) => {
+    let x = event.offsetX;
+    let y = event.offsetY;
+    let squareX = Math.floor(x / 20);
+    let squareY = Math.floor(y / 20);
+
+    sXCurrent = squareX;
+    sYCurrent = squareY;
+    context.fillStyle = colour;
+    context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+
+    const currentCanvas = event.currentTarget;
+    const currentFrame = document.querySelector('.frame-select');
+
+    const canvasStyle = window.getComputedStyle(currentCanvas);
+    const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
+    const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
+
+    let contextCopy = currentFrame.lastElementChild.getContext('2d');
+    
+    contextCopy.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
 
     moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
   });
