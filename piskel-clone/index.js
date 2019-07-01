@@ -59,11 +59,7 @@ addFrame.addEventListener('click', () => {
     canvasList[i].classList.add('hide-main-canvas');
   }
 
-  const selectedInstrument = document.querySelector('.instrument-select');
-  if (selectedInstrument) {
-    drawPencil();
-  }
-
+  selectedInstrument();
 });
 
 // change frame on select
@@ -92,11 +88,7 @@ framesList.addEventListener('click', (event) => {
     animationWindow.style.backgroundImage = `url(${imageList[+frame.innerText  - 1]})`;
   }
 
-  const selectedInstrument = document.querySelector('.instrument-select');
-  if (selectedInstrument) {
-    drawPencil();
-  }
-
+  selectedInstrument();
   operationsOnFrame();
   
 });
@@ -192,10 +184,7 @@ function copyFrame(target) {
 
     imageList.splice(number - 1, 0, prevImage);
 
-    const selectedInstrument = document.querySelector('.instrument-select');
-    if (selectedInstrument) {
-      drawPencil();
-    }
+    selectedInstrument();
   }
 }
 
@@ -273,113 +262,107 @@ palleteTools.addEventListener('click', (event) => {
   } else if (tool.classList.contains('pallete__ul--bucket')) {
     selectElement(tool, 'instrument-select');
 
-   paintBucket();    
+    paintBucket();  
     
   } else if (tool.classList.contains('pallete__ul--pipette')) {
     selectElement(tool, 'instrument-select');
 
-    const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-    const context = canvas.getContext('2d');
-    let isDrawing;
-
-    
   } else if (tool.classList.contains('pallete__ul--move')) {
     selectElement(tool, 'instrument-select');
-
-    const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-    const context = canvas.getContext('2d');
-    let isDrawing;
-
 
   } else if (tool.classList.contains('pallete__ul--exchange')) {
     selectElement(tool, 'instrument-select');
 
     const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
     const context = canvas.getContext('2d');
-    let isDrawing;
-
 
   }
 });
 
 function paintBucket() {
+
   const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-  const context = canvas.getContext('2d');
 
   canvas.removeEventListener('mousedown', pencilDrawAction);
   canvas.removeEventListener('mouseup', pencilDrawAction);
 
-  canvas.addEventListener('click', (event) => {
-    let x = event.offsetX;
-    let y = event.offsetY;
-    let squareX = Math.floor(x / 20);
-    let squareY = Math.floor(y / 20);
+  canvas.addEventListener('click', paintBucketAction); 
+}
 
-    let turnsList = [];
-    turnsList.push([squareX, squareY]);
-    
-    while (turnsList.length) {
-      newPos = turnsList.pop();
-      squareX = newPos[0];
-      squareY = newPos[1];
-      let pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-      let colourBorder = rgbToHex(pixelList);
-      let reachLeft = false;
-      let reachRight = false;
-      let leftSquareCheck = squareX - 1;
-      let colorLeftSquare = '';
-      let rightSquareCheck = squareX + 1;
-      let colorRightSquare = '';
-      while (!colourList.includes(colourBorder) && squareY !== 0) {
-        squareY--;
-        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-        colourBorder = rgbToHex(pixelList);
-      }
+
+function paintBucketAction(event) {
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+  const context = canvas.getContext('2d');
+
+  let x = event.offsetX;
+  let y = event.offsetY;
+  let squareX = Math.floor(x / 20);
+  let squareY = Math.floor(y / 20);
+
+  let turnsList = [];
+  turnsList.push([squareX, squareY]);
+  
+  while (turnsList.length) {
+    newPos = turnsList.pop();
+    squareX = newPos[0];
+    squareY = newPos[1];
+    let pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+    let colourBorder = rgbToHex(pixelList);
+    let reachLeft = false;
+    let reachRight = false;
+    let leftSquareCheck = squareX - 1;
+    let colorLeftSquare = '';
+    let rightSquareCheck = squareX + 1;
+    let colorRightSquare = '';
+    while (!colourList.includes(colourBorder) && squareY !== 0) {
+      squareY--;
       pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
       colourBorder = rgbToHex(pixelList);
-      if (colourList.includes(colourBorder)) squareY++;
-
-      
-      colourBorder = "";
-      while (!colourList.includes(colourBorder) && squareY !== 32) {
-        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-        colourBorder = rgbToHex(pixelList);
-
-        if (!colourList.includes(colourBorder)) {
-          context.fillStyle = colour;
-          context.fillRect(squareX * 20, squareY * 20, 20, 20);
-        }
-
-        // left side
-        let pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
-        colorLeftSquare = rgbToHex(pixelListLeft);
-        if (!colourList.includes(colorLeftSquare)) {
-          if (!reachLeft && leftSquareCheck !== -1) {
-            turnsList.push([leftSquareCheck, squareY]);
-            reachLeft = true;
-          }   
-        } else if (reachLeft) {
-          reachLeft = false;
-        }
-
-        // right side
-        let pixelListRight = context.getImageData(rightSquareCheck * 20, squareY * 20, 1, 1);
-        colorRightSquare = rgbToHex(pixelListRight);
-        if (!colourList.includes(colorRightSquare)) {
-          if (!reachRight && rightSquareCheck !== 32) {
-            turnsList.push([rightSquareCheck, squareY]);
-            reachRight = true;
-          }   
-        } else if (reachRight) {
-          reachRight = false;
-        }
-        squareY++;
-        pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
-        colourBorder = rgbToHex(pixelList);
-      }
     }
-    drawOnCanvases();
-  });
+    pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+    colourBorder = rgbToHex(pixelList);
+    if (colourList.includes(colourBorder)) squareY++;
+
+    
+    colourBorder = "";
+    while (!colourList.includes(colourBorder) && squareY !== 32) {
+      pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+      colourBorder = rgbToHex(pixelList);
+
+      if (!colourList.includes(colourBorder)) {
+        context.fillStyle = colour;
+        context.fillRect(squareX * 20, squareY * 20, 20, 20);
+      }
+
+      // left side
+      let pixelListLeft = context.getImageData(leftSquareCheck * 20, squareY * 20, 1, 1);
+      colorLeftSquare = rgbToHex(pixelListLeft);
+      if (!colourList.includes(colorLeftSquare)) {
+        if (!reachLeft && leftSquareCheck !== -1) {
+          turnsList.push([leftSquareCheck, squareY]);
+          reachLeft = true;
+        }   
+      } else if (reachLeft) {
+        reachLeft = false;
+      }
+
+      // right side
+      let pixelListRight = context.getImageData(rightSquareCheck * 20, squareY * 20, 1, 1);
+      colorRightSquare = rgbToHex(pixelListRight);
+      if (!colourList.includes(colorRightSquare)) {
+        if (!reachRight && rightSquareCheck !== 32) {
+          turnsList.push([rightSquareCheck, squareY]);
+          reachRight = true;
+        }   
+      } else if (reachRight) {
+        reachRight = false;
+      }
+      squareY++;
+      pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+      colourBorder = rgbToHex(pixelList);
+    }
+  }
+  drawOnCanvases();
 }
 
 function drawOnCanvases() {
@@ -397,18 +380,6 @@ function drawOnCanvases() {
   moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
 }
 
-function rgbToHex(rgb) {
-  let red = rgb.data[0];
-  let green = rgb.data[1];
-  let blue = rgb.data[2];
-
-  red.toString(16).length < 2 ? red = `0${red.toString(16)}` : red = `${red.toString(16)}`
-  green.toString(16).length < 2 ? green = `0${green.toString(16)}` : green = `${green.toString(16)}`
-  blue.toString(16).length < 2 ? blue = `0${blue.toString(16)}` : blue = `${blue.toString(16)}`
-
-  return `#${red}${green}${blue}`;
-}
-
 // find certain class remove and add the same class to another element
 function selectElement(tool, styleClass) {
   const selectedTool = document.querySelector(`.${styleClass}`);
@@ -419,7 +390,6 @@ function selectElement(tool, styleClass) {
 
 function drawPencil() {
   const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-  const context = canvas.getContext('2d');
   let isDrawing;
 
   let coordinates = document.querySelector('.coordinates');
@@ -456,7 +426,7 @@ function drawPencil() {
     }
   });
 
-
+  canvas.removeEventListener('click', paintBucketAction);
   canvas.addEventListener('mousedown', pencilDrawAction);
 }
 
@@ -521,17 +491,6 @@ function pencilDrawAction() {
   });
 }
 
-// move image from big canvas to small canvas
-function moveImageFromBCanToS(mainCanvas, frame, w, h) {
-  const resizeCnavas = document.createElement('canvas');
-  resizeCnavas.width = 270;
-  resizeCnavas.height = 270;
-  const resizeContext = resizeCnavas.getContext('2d');
-  resizeContext.drawImage(mainCanvas, 0, 0, w, h, 0, 0, 270, 270);
-
-  imageList[+frame.innerText - 1] = resizeCnavas.toDataURL();
-}
-
 let numAnimation = imageList.length;
 let currentAnimation = 0;
 
@@ -564,3 +523,37 @@ function animate() {
 }
 
 let interval = setInterval(animate, 1000/sliderValue);
+
+
+// BASIC functions
+function selectedInstrument() {
+  const selectedInstrument = document.querySelector('.instrument-select');
+  if (selectedInstrument.classList.contains('pallete__ul--pencil')) {
+    drawPencil();
+  } else if (selectedInstrument.classList.contains('pallete__ul--bucket')) {
+    paintBucket();
+  }
+}
+
+function rgbToHex(rgb) {
+  let red = rgb.data[0];
+  let green = rgb.data[1];
+  let blue = rgb.data[2];
+
+  red.toString(16).length < 2 ? red = `0${red.toString(16)}` : red = `${red.toString(16)}`
+  green.toString(16).length < 2 ? green = `0${green.toString(16)}` : green = `${green.toString(16)}`
+  blue.toString(16).length < 2 ? blue = `0${blue.toString(16)}` : blue = `${blue.toString(16)}`
+
+  return `#${red}${green}${blue}`;
+}
+
+// move image from big canvas to small canvas
+function moveImageFromBCanToS(mainCanvas, frame, w, h) {
+  const resizeCnavas = document.createElement('canvas');
+  resizeCnavas.width = 270;
+  resizeCnavas.height = 270;
+  const resizeContext = resizeCnavas.getContext('2d');
+  resizeContext.drawImage(mainCanvas, 0, 0, w, h, 0, 0, 270, 270);
+
+  imageList[+frame.innerText - 1] = resizeCnavas.toDataURL();
+}
