@@ -6,7 +6,7 @@ const canvasHeight = 640;
 const canvasWidth = 640;
 let imageList = []
 let sliderValue = 5;
-let colour = '#408080'; //'#000000';
+let colour = '#408080';
 let colourList = [colour];
 
 // INITIALIZE
@@ -267,6 +267,7 @@ palleteTools.addEventListener('click', (event) => {
   } else if (tool.classList.contains('pallete__ul--pipette')) {
     selectElement(tool, 'instrument-select');
 
+    eyedropper();
   } else if (tool.classList.contains('pallete__ul--move')) {
     selectElement(tool, 'instrument-select');
 
@@ -279,10 +280,40 @@ palleteTools.addEventListener('click', (event) => {
   }
 });
 
-function paintBucket() {
-
+function eyedropper() {
   const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
 
+  canvas.removeEventListener('click', drawOneSquare);
+  canvas.removeEventListener('click', paintBucketAction); 
+  canvas.removeEventListener('mouseup', pencilDrawAction);
+  canvas.removeEventListener('mousedown', pencilDrawAction);
+  
+  canvas.addEventListener('click', eyedropperAction);
+}
+
+function eyedropperAction() {
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+  const context = canvas.getContext('2d');
+
+  let x = event.offsetX;
+  let y = event.offsetY;
+  let squareX = Math.floor(x / 20);
+  let squareY = Math.floor(y / 20);
+
+  let pixelList = context.getImageData(squareX * 20, squareY * 20, 1, 1);
+  let currentColour = rgbToHex(pixelList);
+
+  if (currentColour !== false) {
+    const colorPalette1st = document.querySelector('.first-colour');
+    colorPalette1st.value = currentColour;
+    colour = currentColour;
+  }
+}
+
+function paintBucket() {
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+
+  canvas.removeEventListener('click', eyedropperAction);
   canvas.removeEventListener('mousedown', pencilDrawAction);
   canvas.removeEventListener('mouseup', pencilDrawAction);
 
@@ -427,6 +458,7 @@ function drawPencil() {
   });
 
   canvas.removeEventListener('click', paintBucketAction);
+  canvas.removeEventListener('click', eyedropperAction);
   canvas.addEventListener('mousedown', pencilDrawAction);
 }
 
@@ -465,30 +497,35 @@ function pencilDrawAction() {
     moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
   });
 
-  canvas.addEventListener('click', (event) => {
-    let x = event.offsetX;
-    let y = event.offsetY;
-    let squareX = Math.floor(x / 20);
-    let squareY = Math.floor(y / 20);
+  canvas.addEventListener('click', drawOneSquare);
+}
 
-    sXCurrent = squareX;
-    sYCurrent = squareY;
-    context.fillStyle = colour;
-    context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+function drawOneSquare(event) {
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+  const context = canvas.getContext('2d'); 
 
-    const currentCanvas = event.currentTarget;
-    const currentFrame = document.querySelector('.frame-select');
+  let x = event.offsetX;
+  let y = event.offsetY;
+  let squareX = Math.floor(x / 20);
+  let squareY = Math.floor(y / 20);
 
-    const canvasStyle = window.getComputedStyle(currentCanvas);
-    const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
-    const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
+  sXCurrent = squareX;
+  sYCurrent = squareY;
+  context.fillStyle = colour;
+  context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
 
-    let contextCopy = currentFrame.lastElementChild.getContext('2d');
-    
-    contextCopy.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
+  const currentCanvas = event.currentTarget;
+  const currentFrame = document.querySelector('.frame-select');
 
-    moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
-  });
+  const canvasStyle = window.getComputedStyle(currentCanvas);
+  const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
+  const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
+
+  let contextCopy = currentFrame.lastElementChild.getContext('2d');
+  
+  contextCopy.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
+
+  moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
 }
 
 let numAnimation = imageList.length;
@@ -532,6 +569,8 @@ function selectedInstrument() {
     drawPencil();
   } else if (selectedInstrument.classList.contains('pallete__ul--bucket')) {
     paintBucket();
+  } else if (selectedInstrument.classList.contains('pallete__ul--pipette')) {
+    eyedropper();
   }
 }
 
@@ -539,12 +578,18 @@ function rgbToHex(rgb) {
   let red = rgb.data[0];
   let green = rgb.data[1];
   let blue = rgb.data[2];
+  let alpha = rgb.data[3];
 
-  red.toString(16).length < 2 ? red = `0${red.toString(16)}` : red = `${red.toString(16)}`
-  green.toString(16).length < 2 ? green = `0${green.toString(16)}` : green = `${green.toString(16)}`
-  blue.toString(16).length < 2 ? blue = `0${blue.toString(16)}` : blue = `${blue.toString(16)}`
+  if (red === 0 && green === 0 && blue === 0 && alpha === 0) {
+    return false
+  } else {
+    red.toString(16).length < 2 ? red = `0${red.toString(16)}` : red = `${red.toString(16)}`
+    green.toString(16).length < 2 ? green = `0${green.toString(16)}` : green = `${green.toString(16)}`
+    blue.toString(16).length < 2 ? blue = `0${blue.toString(16)}` : blue = `${blue.toString(16)}`
 
-  return `#${red}${green}${blue}`;
+    return `#${red}${green}${blue}`;
+  }
+  
 }
 
 // move image from big canvas to small canvas
