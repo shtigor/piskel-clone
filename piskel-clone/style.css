@@ -56,20 +56,16 @@ body {
   box-shadow: 0 3px 3px #ccc;
 }
 
-.pallete__ul--pencil,
-.pallete__ul--bucket,
-.pallete__ul--pipette,
-.pallete__ul--move,
-.pallete__ul--exchange {
-  margin-top: 2px;
-  margin-bottom: 2px;
-  padding: 6px;
-}
-
 .pallete__ul--img {
   display: block;
   width: 30px;
   margin: 0 auto;
+}
+
+.instrument {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 6px;
 }
 
 .instrument-select {

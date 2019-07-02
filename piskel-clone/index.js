@@ -268,6 +268,10 @@ palleteTools.addEventListener('click', (event) => {
     selectElement(tool, 'instrument-select');
 
     eyedropper();
+  } else if (tool.classList.contains('pallete__ul--eraser')) {
+    selectElement(tool, 'instrument-select');
+
+    drawPencil();
   } else if (tool.classList.contains('pallete__ul--move')) {
     selectElement(tool, 'instrument-select');
 
@@ -279,6 +283,7 @@ palleteTools.addEventListener('click', (event) => {
 
   }
 });
+
 
 function eyedropper() {
   const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
@@ -464,6 +469,12 @@ function drawPencil() {
 
 function pencilDrawAction() { 
   const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+
+  const selectedInstrument = document.querySelector('.instrument-select');
+  if (selectedInstrument.classList.contains('pallete__ul--eraser')) {
+    colour = 'rgba(0,0,0,0)';
+  }
+
   const context = canvas.getContext('2d'); 
   let isDrawing = true;
 
@@ -503,6 +514,11 @@ function pencilDrawAction() {
 function drawOneSquare(event) {
   const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
   const context = canvas.getContext('2d'); 
+
+  const selectedInstrument = document.querySelector('.instrument-select');
+  if (selectedInstrument.classList.contains('pallete__ul--eraser')) {
+    colour = 'rgba(0,0,0,0)';
+  }
 
   let x = event.offsetX;
   let y = event.offsetY;
