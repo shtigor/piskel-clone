@@ -401,21 +401,6 @@ function paintBucketAction(event) {
   drawOnCanvases();
 }
 
-function drawOnCanvases() {
-  const currentCanvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-  const currentFrame = document.querySelector('.frame-select');
-
-  const canvasStyle = window.getComputedStyle(currentCanvas);
-  const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
-  const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
-
-  let context = currentFrame.lastElementChild.getContext('2d');
-  
-  context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
-
-  moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
-}
-
 // find certain class remove and add the same class to another element
 function selectElement(tool, styleClass) {
   const selectedTool = document.querySelector(`.${styleClass}`);
@@ -433,6 +418,8 @@ function drawPencil() {
   let sYCurrent = -1;
   let sXLast = 0;
   let sYLast = 0;
+
+  // TODO: not work
 
   canvas.addEventListener('mousemove', (event) => {
     let ctx = canvas.getContext('2d');
@@ -468,16 +455,11 @@ function drawPencil() {
 }
 
 function pencilDrawAction() { 
-  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
-
   const selectedInstrument = document.querySelector('.instrument-select');
-  if (selectedInstrument.classList.contains('pallete__ul--eraser')) {
-    colour = 'rgba(0,0,0,0)';
-  }
-
+  const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
   const context = canvas.getContext('2d'); 
   let isDrawing = true;
-
+  
   canvas.addEventListener('mousemove', (event) => {
     if (isDrawing) {
       let x = event.offsetX;
@@ -487,38 +469,26 @@ function pencilDrawAction() {
 
       sXCurrent = squareX;
       sYCurrent = squareY;
-      context.fillStyle = colour;
-      context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+      if (selectedInstrument.classList.contains('pallete__ul--pencil')) {
+        context.fillStyle = colour;
+        context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+      } else if (selectedInstrument.classList.contains('pallete__ul--eraser')) {
+        context.clearRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+      }
     }
   });
 
   canvas.addEventListener('mouseup', (event) => {
-    const currentCanvas = event.currentTarget;
-    const currentFrame = document.querySelector('.frame-select');
-
-    const canvasStyle = window.getComputedStyle(currentCanvas);
-    const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
-    const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
-
-    let context = currentFrame.lastElementChild.getContext('2d');
-    
-    context.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
-    isDrawing = false;
-
-    moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
+    isDrawing = false;   
+    drawOnCanvases();
   });
-
   canvas.addEventListener('click', drawOneSquare);
 }
 
 function drawOneSquare(event) {
+  const selectedInstrument = document.querySelector('.instrument-select');
   const canvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
   const context = canvas.getContext('2d'); 
-
-  const selectedInstrument = document.querySelector('.instrument-select');
-  if (selectedInstrument.classList.contains('pallete__ul--eraser')) {
-    colour = 'rgba(0,0,0,0)';
-  }
 
   let x = event.offsetX;
   let y = event.offsetY;
@@ -527,21 +497,14 @@ function drawOneSquare(event) {
 
   sXCurrent = squareX;
   sYCurrent = squareY;
-  context.fillStyle = colour;
-  context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+  if (selectedInstrument.classList.contains('pallete__ul--pencil')) {
+    context.fillStyle = colour;
+    context.fillRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+  } else if (selectedInstrument.classList.contains('pallete__ul--eraser')) {
+    context.clearRect(sXCurrent * 20, sYCurrent * 20, 20, 20);
+  }
 
-  const currentCanvas = event.currentTarget;
-  const currentFrame = document.querySelector('.frame-select');
-
-  const canvasStyle = window.getComputedStyle(currentCanvas);
-  const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
-  const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
-
-  let contextCopy = currentFrame.lastElementChild.getContext('2d');
-  
-  contextCopy.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
-
-  moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
+  drawOnCanvases();
 }
 
 let numAnimation = imageList.length;
@@ -606,6 +569,24 @@ function rgbToHex(rgb) {
     return `#${red}${green}${blue}`;
   }
   
+}
+
+// copy from main canvas to frame and preview
+function drawOnCanvases() {
+  const currentCanvas = document.querySelector('.canvas-main:not(.hide-main-canvas)');
+  const currentFrame = document.querySelector('.frame-select');
+
+  const canvasStyle = window.getComputedStyle(currentCanvas);
+  const widthCanvas = parseInt(canvasStyle.getPropertyValue('width'));
+  const heightCanvas = parseInt(canvasStyle.getPropertyValue('height'));
+
+  let canvasFrame = currentFrame.lastElementChild;
+  let canvasFrameContext = canvasFrame.getContext('2d');
+  
+  // canvasFrameContext.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
+  canvasFrameContext.putImageData(currentCanvas.getContext('2d'), 0, 0, widthCanvas, heightCanvas, 107, 107);
+
+  moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
 }
 
 // move image from big canvas to small canvas
