@@ -583,9 +583,8 @@ function drawOnCanvases() {
   let canvasFrame = currentFrame.lastElementChild;
   let canvasFrameContext = canvasFrame.getContext('2d');
   
-  // canvasFrameContext.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
-  canvasFrameContext.putImageData(currentCanvas.getContext('2d'), 0, 0, widthCanvas, heightCanvas, 107, 107);
-
+  canvasFrameContext.clearRect(0,0,107,107);
+  canvasFrameContext.drawImage(currentCanvas, 0, 0, widthCanvas, heightCanvas, 0, 0, 107, 107);
   moveImageFromBCanToS(currentCanvas, currentFrame, widthCanvas, heightCanvas);
 }
 
